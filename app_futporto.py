@@ -4,6 +4,35 @@ import json
 import os
 from itertools import combinations
 
+# --- AUTENTICAÇÃO POR PASSWORD ---
+def obter_password():
+    # Tenta ler dos Secrets do Streamlit Cloud; se não existir, usa uma de apoio local
+    try:
+        if "auth" in st.secrets and "password" in st.secrets["auth"]:
+            return str(st.secrets["auth"]["password"])
+    except Exception:
+        pass
+    return "futporto2026"
+
+if "autenticado" not in st.session_state:
+    st.session_state.autenticado = False
+
+if not st.session_state.autenticado:
+    st.title("⚽ FutPorto — Acesso Reservado")
+    st.info("Introduz a palavra-passe para aceder e gerir o torneio.")
+
+    with st.form("form_login"):
+        pwd = st.text_input("Palavra-passe", type="password")
+        entrar = st.form_submit_button("Entrar", use_container_width=True)
+
+        if entrar:
+            if pwd == obter_password():
+                st.session_state.autenticado = True
+                st.rerun()
+            else:
+                st.error("Palavra-passe incorreta.")
+    st.stop()
+
 # Configuração da página
 st.set_page_config(page_title="FutPorto — Gestor de Torneio", page_icon="⚽", layout="wide")
 
